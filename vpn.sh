@@ -86,7 +86,6 @@ function allowIpForward(){
 }
 
 function doSetupNetwork() {
-    clearFirewall
     # ToDo
     # uncomment row "net.ipv4.ip_forward = 1" in /etc/sysctl.conf
     setupFirewall
@@ -226,6 +225,7 @@ function doServer(){
             sed -i "s/PUT_YOUR_PSK_HERE/$myPSK/g" "$cf_ipsec_secrets"
             eval "systemctl restart ${ipsec}-starter"
 
+            clearFirewall
             ip a s|sed -ne '/127.0.0.1/!{s/^[ \t]*inet[ \t]*\([0-9.]\+\)\/.*$/\1/p}'|while read myIP; do
 
               lastfilenum=`echo $(find /etc/xl2tpd/xl2tpd*|while read LINE; do echo ${LINE%%.conf}|grep -Eo '[0-9]+$';done|sort -r|head -n1)`;
@@ -235,7 +235,7 @@ function doServer(){
               sed -e "s/yourip/$myIP/g" -e "s/rangestart/$lastfilenumadded/g" -i /etc/xl2tpd/xl2tpd"$lastfilenumadded".conf
               xl2tpd -c /etc/xl2tpd/xl2tpd"$lastfilenumadded".conf -p /var/run/xl2tpd"$lastfilenumadded".pid
 
-              #clearFirewall
+
               iptables -t nat -A POSTROUTING -s 10.19."$lastfilenumadded".0/24 -o eth0 -j SNAT --to-source $myIP
 
             done
