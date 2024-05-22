@@ -218,6 +218,7 @@ function doServer(){
             eval "systemctl disable $l2tp"
 
 	    doInstallConfigAll
+            rm -rf /etc/xl2tpd/xl2tpd.conf
             read -p "give a user:" myUser </dev/tty
             read -p "give a pass:" myPass </dev/tty
             sed -e "s/testvpnuser/$myUser/g" -e "s/testvpnpassword/$myPass/g" -i "$cf_ppp_secrets"
