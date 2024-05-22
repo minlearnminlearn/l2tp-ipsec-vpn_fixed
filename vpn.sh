@@ -223,6 +223,7 @@ function doServer(){
             sed -e "s/testvpnuser/$myUser/g" -e "s/testvpnpassword/$myPass/g" -i "$cf_ppp_secrets"
             read -p "give a sharedpsk:" myPSK </dev/tty
             sed -i "s/PUT_YOUR_PSK_HERE/$myPSK/g" "$cf_ipsec_secrets"
+            eval "systemctl restart ${ipsec}-starter"
 
             ip a s|sed -ne '/127.0.0.1/!{s/^[ \t]*inet[ \t]*\([0-9.]\+\)\/.*$/\1/p}'|while read myIP; do
 
@@ -237,7 +238,6 @@ function doServer(){
               iptables -t nat -A POSTROUTING -s 10.19."$lastfilenumadded".0/24 -o eth0 -j SNAT --to-source $myIP
 
             done
-            eval "systemctl restart ${ipsec}-starter"
 	;;
 	reinstall)
 	    eval "$PM reinstall -y $ipsec $l2tp"
