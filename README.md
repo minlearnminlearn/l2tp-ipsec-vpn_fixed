@@ -5,14 +5,15 @@
 wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - server install
 when promote，input the username,password,shared psk
 
-2，add new ip（from 2th）：
-wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - add-standip
-when promote，input the ip
-
-3，force reinstall :
+2，force reinstall :
 wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - server remove
 wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - server purge
+reboot
 then repeat 1,2 to reinstall
+
+(option) add new ip ：
+wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - add-standip
+when promote，input the ip
 
 
 # L2TP/IPSEC PSK VPN install, configure and control script
