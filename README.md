@@ -1,3 +1,20 @@
+
+# commands
+
+1，install :
+wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - server install
+when promote，input the username,password,shared psk
+
+2，add new ip（from 2th）：
+wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - add-standip
+when promote，input the ip
+
+3，force reinstall :
+wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - server remove
+wget -qO- https://raw.githubusercontent.com/minlearnminlearn/l2tp-ipsec-vpn_fixed/main/vpn.sh|bash -s - server purge
+then repeat 1,2 to reinstall
+
+
 # L2TP/IPSEC PSK VPN install, configure and control script
 Once I asked myself: dude, how to install and configure a VPN server? That night I will never forget. Long and tedious reading of the documentation and tons of Google requests, yeah that's was hard! Then I decided to make an automatic script for installing configuration and management for myself and you.
 
