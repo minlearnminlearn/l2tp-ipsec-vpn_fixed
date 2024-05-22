@@ -216,32 +216,28 @@ function doServer(){
 	    eval "$PM install -y $ipsec $l2tp"
             eval "systemctl stop $l2tp"
             eval "systemctl disable $l2tp"
+
 	    doInstallConfigAll
-
-
-
-  lastfilenum=`echo $(find /etc/xl2tpd/xl2tpd*|while read LINE; do echo ${LINE%%.conf}|grep -Eo '[0-9]+$';done|sort -r|head -n1)`;
-  [[ $lastfilenum == '' ]] && lastfilenum=0;
-  lastfilenumadded=`expr $lastfilenum + 1`;
-  wget -O /etc/xl2tpd/xl2tpd"$lastfilenumadded".conf "$cfurl_l2tp"
-  read -p "give a newip:" myIP </dev/tty
-  sed -e "s/yourip/$myIP/g" -e "s/rangestart/$lastfilenumadded/g" -i /etc/xl2tpd/xl2tpd"$lastfilenumadded".conf
-  xl2tpd -c /etc/xl2tpd/xl2tpd"$lastfilenumadded".conf -p /var/run/xl2tpd"$lastfilenumadded".pid
-
-  clearFirewall
-  iptables -t nat -A POSTROUTING -s 10.19.0.0/24 -o eth0 -j SNAT --to-source `echo $(ip a s|sed -ne '/127.0.0.1/!{s/^[ \t]*inet[ \t]*\([0-9.]\+\)\/.*$/\1/p}'|head -n1)`
-  iptables -t nat -A POSTROUTING -s 10.19."$lastfilenumadded".0/24 -o eth0 -j SNAT --to-source $myIP
-
-
-
-            myIP=$(ip a s|sed -ne '/127.0.0.1/!{s/^[ \t]*inet[ \t]*\([0-9.]\+\)\/.*$/\1/p}'|head -n1)
-            sed -e "s/yourip/$myIP/g" -e "s/rangestart/0/g" -i "$cf_l2tp"
             read -p "give a user:" myUser </dev/tty
             read -p "give a pass:" myPass </dev/tty
             sed -e "s/testvpnuser/$myUser/g" -e "s/testvpnpassword/$myPass/g" -i "$cf_ppp_secrets"
             read -p "give a sharedpsk:" myPSK </dev/tty
             sed -i "s/PUT_YOUR_PSK_HERE/$myPSK/g" "$cf_ipsec_secrets"
-            doControl restart
+
+            ip a s|sed -ne '/127.0.0.1/!{s/^[ \t]*inet[ \t]*\([0-9.]\+\)\/.*$/\1/p}'|while read myIP; do
+
+              lastfilenum=`echo $(find /etc/xl2tpd/xl2tpd*|while read LINE; do echo ${LINE%%.conf}|grep -Eo '[0-9]+$';done|sort -r|head -n1)`;
+              [[ $lastfilenum == '' ]] && lastfilenum=0;
+              lastfilenumadded=`expr $lastfilenum + 1`;
+              wget -O /etc/xl2tpd/xl2tpd"$lastfilenumadded".conf "$cfurl_l2tp"
+              sed -e "s/yourip/$myIP/g" -e "s/rangestart/$lastfilenumadded/g" -i /etc/xl2tpd/xl2tpd"$lastfilenumadded".conf
+              xl2tpd -c /etc/xl2tpd/xl2tpd"$lastfilenumadded".conf -p /var/run/xl2tpd"$lastfilenumadded".pid
+
+              #clearFirewall
+              iptables -t nat -A POSTROUTING -s 10.19."$lastfilenumadded".0/24 -o eth0 -j SNAT --to-source $myIP
+
+            done
+            eval "systemctl restart ${ipsec}-starter"
 	;;
 	reinstall)
 	    eval "$PM reinstall -y $ipsec $l2tp"
